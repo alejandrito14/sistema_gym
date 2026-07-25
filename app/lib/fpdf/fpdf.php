@@ -1931,5 +1931,5 @@ protected function _enddoc()
 	$this->state = 3;
 }
 }
-?>
+
 

@@ -22,11 +22,21 @@ if (file_exists($controllerPath)) {
     $controller = new $controllerName;
     
     if (method_exists($controller, $method)) {
-        call_user_func_array([$controller, $method], $params);
+        try {
+            call_user_func_array([$controller, $method], $params);
+        } catch (Throwable $e) {
+            // Registrar excepción con traza
+            $log = "CALL_USER ERROR [" . date('Y-m-d H:i:s') . "] " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n";
+            file_put_contents(__DIR__ . '/php-error.log', $log, FILE_APPEND);
+            http_response_code(500);
+            echo "Error interno. Revisa public/php-error.log.";
+            exit;
+        }
     } else {
         echo "Error: El método no existe.";
     }
 } else {
     // Si el controlador no existe (ej: 404), podrías redirigir al login o home
     header('Location: /auth/index');
+    exit;
 }
